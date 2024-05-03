@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HW4_Spreadsheet_Application.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="HW4_Spreadsheet_Application.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Spreadsheet_Matthew_Wong"
+        Background="White">
+
+    <Window.Resources>
+        <vm:RowViewModelToIBrushConverter x:Key="RowBrushConverter"/>
+    </Window.Resources>
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+     <DockPanel>
+         <!-- Using a Stack Panel to create that menu bar with our options of File, Edit, and Cell -->
+         <StackPanel Orientation="Horizontal" Background="LightGray" DockPanel.Dock="Top">
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem
+                        Header="Open"
+                        Command="{Binding LoadFromFile}"/>
+                    <MenuItem 
+                        Header="Save"
+                        Command="{Binding SavetoFile}"/>
+                </MenuItem>
+                
+                <MenuItem Header="Edit">
+                    <MenuItem 
+                        Name="UndoMenuItem" 
+                        Header="{Binding UndoMenuItem}"
+                        IsEnabled="{Binding UndoAvaliable}" 
+                        Command="{Binding UndoCommand}">
+                    </MenuItem>
+                    
+                    <MenuItem 
+                        Name="RedoMenuItem" 
+                        Header="{Binding RedoMenuItem}"
+                        IsEnabled="{Binding RedoAvaliable}" 
+                        Command="{Binding RedoCommand}">
+                    </MenuItem>
+                </MenuItem>
+                
+                <MenuItem Header="Cell">
+                    <ColorPicker 
+                        Name="SpreadsheetColorPicker" 
+                        ColorChanged="OnColorChanged" 
+                        Margin="20 5" />
+                </MenuItem>
+            </Menu>
+            
+        </StackPanel>
+        
+        <DataGrid Name="SpreadsheetDataGrid" 
+                  ItemsSource="{Binding _SpreadsheetData}"
+                  AutoGenerateColumns="False" 
+                  HeadersVisibility="All"
+                  HorizontalScrollBarVisibility="Auto" 
+                  VerticalScrollBarVisibility="Auto"
+                  RowHeaderWidth="40"
+                  LoadingRow="LoadingRow">
+
+            <DataGrid.Styles>
+                <!-- Add bottom lines to row headers -->
+                <Style Selector="DataGridRowHeader">
+                    <Setter Property="AreSeparatorsVisible" Value="True" />
+                </Style>
+                <!-- Add bottom and right lines to grid cells -->
+                <Style Selector="DataGridCell /template/ ContentPresenter">
+                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                    <Setter Property="BorderBrush" Value="#33000000" />
+                </Style>
+                
+                <Style Selector="DataGridRow:selected /template/Rectangle#BackgroundRectangle">
+                    <Setter Property="Fill" Value="Transparent" />
+                </Style>
+                <Style Selector="DataGridRowHeader:selected">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+                <Style Selector="DataGridRowHeader:selected /template/Rectangle#BackgroundRectangle">
+                    <Setter Property="Fill" Value="Transparent" />
+                </Style>
+                <Style Selector="DataGridCell.SpreadsheetCellClass"
+                       x:DataType="vm:RowViewModel">
+                    <Setter Property="Background"
+                            Value="{Binding SelfReference,
+                            Converter={StaticResource RowBrushConverter}}" />
+                </Style>
+                
+            </DataGrid.Styles>
+            
+        </DataGrid>
+    </DockPanel>
+    
+</Window>
